@@ -29,7 +29,7 @@ public class TurretPIDTest2 extends LinearOpMode{
         robot.init();
         TelemetryPacket packet = new TelemetryPacket();
 
-        MultipleTelemetry tele = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        MultipleTelemetry tele = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
         dashboard = FtcDashboard.getInstance();
 
@@ -39,13 +39,14 @@ public class TurretPIDTest2 extends LinearOpMode{
         timer.reset();
 
         while (!isStopRequested()) {
-            robot.lift.setTargetHeight(400);
+            robot.lift.setTargetHeight(650);
             tele.addData("turret goal", robot.turret.getTargetAngle());
             tele.addData("turret pos", robot.turret.getCurrentAngle());
             tele.addData("turret PID", robot.turret.getPID());
             tele.addData("slide height", robot.lift.getCurrentHeight());
             tele.addData("tmotor power", robot.turret.getMotorPower());
             tele.addData("rotation", -gamepad1.right_stick_x);
+            tele.addData("testPower", robot.turret.getTestPower());
 
             packet.put("turret goal", robot.turret.getTargetAngle());
             packet.put("turret pos", robot.turret.getCurrentAngle());
@@ -53,6 +54,8 @@ public class TurretPIDTest2 extends LinearOpMode{
             packet.put("slide height", robot.lift.getCurrentHeight());
             packet.put("tmotor power", robot.turret.getMotorPower());
             packet.put("rotation", -gamepad1.right_stick_x);
+            packet.put("testPower", robot.turret.getTestPower());
+
 
             dashboard.sendTelemetryPacket(packet);
 

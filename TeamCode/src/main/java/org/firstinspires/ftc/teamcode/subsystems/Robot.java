@@ -31,6 +31,8 @@ public class Robot {
         subsystems = new ArrayList<>();
         subsystems.add(drive);
         subsystems.add(lift);
+        subsystems.add(turret);
+        subsystems.add(intake);
     }
 
 

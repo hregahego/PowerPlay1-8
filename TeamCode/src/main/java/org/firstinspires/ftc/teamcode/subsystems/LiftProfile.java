@@ -6,20 +6,19 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
-import com.acmerobotics.roadrunner.profile.MotionProfile;
-import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
-import com.acmerobotics.roadrunner.profile.MotionState;
+import org.firstinspires.ftc.teamcode.controls.ProfiledPID;
 
-public class Lift implements Subsystem {
+public class LiftProfile implements Subsystem {
 
     private DcMotorEx motor1;
     private DcMotorEx motor2;
 
     private static double kP = 0.022, kI = 0, kD = 0.0003; //0.6, 0, 0.01
-    private static double ff = 0.16;
+    private static double kF = 0.16;
 
     private static int MAX_VEL;
     private static int MAX_ACCEL;
@@ -35,19 +34,20 @@ public class Lift implements Subsystem {
 
     private double PID;
 
-    private MotionProfile profile;
+    private ProfiledPID controller;
 
     ElapsedTime PIDTimer = new ElapsedTime();
 
     ElapsedTime mpTimer = new ElapsedTime();
 
-    public Lift(HardwareMap hardwareMap, Telemetry telemetry) {
+    public LiftProfile(HardwareMap hardwareMap, Telemetry telemetry) {
         motor1 = hardwareMap.get(DcMotorEx.class, "lift1");
         motor2 = hardwareMap.get(DcMotorEx.class, "lift2");
 
         //reverse correctly
         motor1.setDirection(DcMotorEx.Direction.REVERSE);
 
+        controller = new ProfiledPID(kP, kD, kI, kF, MAX_VEL, MAX_ACCEL);
     }
 
     @Override
@@ -59,14 +59,7 @@ public class Lift implements Subsystem {
 
     @Override
     public void update() {
-        MotionState state = profile.get(mpTimer.seconds());
-
-        double instantTargetPosition = state.getX();
-
         //PID = PIDController(targetHeight, currentHeight);
-
-        PID = PIDController(instantTargetPosition, currentHeight);
-
 
         if (targetHeight > 1000) {
             targetHeight = 1000;
@@ -75,12 +68,10 @@ public class Lift implements Subsystem {
 
         if (targetHeight == 0 && currentHeight < 0.3) {
             setLiftPower(0);
-        } else if (motor1.getPower() > 0.5 && motor1.getCurrent(CurrentUnit.AMPS) > 10) {
-            setLiftPower(-1);
-        } else if (Math.abs(targetHeight - currentHeight) < 5) {
-            setLiftPower(ff);
+        } else if (targetHeight > currentHeight && motor1.getCurrent(CurrentUnit.AMPS) > 10) {
+            setTargetHeight(0);
         } else {
-            setLiftPower(PID);
+            setLiftPower(controller.calculate(targetHeight));
         }
     }
 
@@ -95,21 +86,11 @@ public class Lift implements Subsystem {
         motor1.setPower(power);
     }
 
-    public double PIDController(double reference, double state) {
-        double error = reference - state;
-        integralSum += error * PIDTimer.seconds();
-        double derivative = (error - lastError) / PIDTimer.seconds();
-        lastError = error;
 
-        PIDTimer.reset();
-
-        double output = (error * kP) + (derivative * kD) + (integralSum * kI);
-        return output;
+    public void setTargetHeight(double height) {
+        targetHeight = height;
+        controller.setGoal(targetHeight);
     }
-
-//    public void setTargetHeight(double height) {
-//        targetHeight = height;
-//    }
 
     public Double getTargetHeight() {
         return targetHeight;
@@ -129,26 +110,10 @@ public class Lift implements Subsystem {
         return PID;
     }
 
-    public void setFF(double input) {
-        ff = input;
-    }
-
-    public void setPID (double P, double I, double D) {
+    public void setPIDF (double P, double I, double D, double F) {
         kP = P;
         kI = I;
         kD = D;
-    }
-
-    public void setTargetHeight(double height) {
-        targetHeight = height;
-
-        profile = MotionProfileGenerator.generateSimpleMotionProfile(
-                new MotionState(0, 0, 0),
-                new MotionState(targetHeight, 0, 0),
-                MAX_VEL,
-                MAX_ACCEL,
-                100
-        );
-        mpTimer.reset();
+        kF = F;
     }
 }

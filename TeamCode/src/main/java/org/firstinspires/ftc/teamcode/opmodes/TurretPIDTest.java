@@ -47,7 +47,7 @@ public class TurretPIDTest extends LinearOpMode{
 //            );
             switch (Pos) {
                 case LEFT:
-                    //robot.turret.setTargetAngle(125);
+                    robot.turret.setTargetAngle(125);
                     robot.turret.tmotor.setPower(0.5);
                     if (timer.milliseconds() > 2500) {
                         Pos = ArmPos.RIGHT;
