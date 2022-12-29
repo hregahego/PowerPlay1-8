@@ -12,11 +12,15 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.profile.MotionProfileGenerator;
 import com.acmerobotics.roadrunner.profile.MotionState;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class Lift implements Subsystem {
 
     private DcMotorEx motor1;
-    private DcMotorEx motor2;
+    public DcMotorEx motor2;
+    public Servo horizontalServo1;
+    public Servo horizontalServo2;
+
 
     private static double kP = 0.022, kI = 0, kD = 0.0003; //0.6, 0, 0.01
     private static double ff = 0.16;
@@ -44,7 +48,8 @@ public class Lift implements Subsystem {
     public Lift(HardwareMap hardwareMap, Telemetry telemetry) {
         motor1 = hardwareMap.get(DcMotorEx.class, "lift1");
         motor2 = hardwareMap.get(DcMotorEx.class, "lift2");
-
+        horizontalServo1 = hardwareMap.get(Servo.class, "horizontal1");
+        horizontalServo2 = hardwareMap.get(Servo.class, "horizontal2");
         //reverse correctly
         motor1.setDirection(DcMotorEx.Direction.REVERSE);
 
@@ -59,17 +64,17 @@ public class Lift implements Subsystem {
 
     @Override
     public void update() {
-        MotionState state = profile.get(mpTimer.seconds());
+        //MotionState state = profile.get(mpTimer.seconds());
 
-        double instantTargetPosition = state.getX();
+        //double instantTargetPosition = state.getX();
 
-        //PID = PIDController(targetHeight, currentHeight);
+        PID = PIDController(targetHeight, currentHeight);
 
-        PID = PIDController(instantTargetPosition, currentHeight);
+        //PID = PIDController(instantTargetPosition, currentHeight);
 
 
-        if (targetHeight > 1000) {
-            targetHeight = 1000;
+        if (targetHeight > 1900) {
+            targetHeight = 1900;
         }
         currentHeight = getCurrentHeight();
 
@@ -77,7 +82,7 @@ public class Lift implements Subsystem {
             setLiftPower(0);
         } else if (motor1.getPower() > 0.5 && motor1.getCurrent(CurrentUnit.AMPS) > 10) {
             setLiftPower(-1);
-        } else if (Math.abs(targetHeight - currentHeight) < 5) {
+        } else if (Math.abs(targetHeight - currentHeight) < 50) {
             setLiftPower(ff);
         } else {
             setLiftPower(PID);
@@ -142,13 +147,11 @@ public class Lift implements Subsystem {
     public void setTargetHeight(double height) {
         targetHeight = height;
 
-        profile = MotionProfileGenerator.generateSimpleMotionProfile(
-                new MotionState(0, 0, 0),
-                new MotionState(targetHeight, 0, 0),
-                MAX_VEL,
-                MAX_ACCEL,
-                100
-        );
-        mpTimer.reset();
     }
+
+    public void setHorizontalPosition(double distance) {
+        horizontalServo1.setPosition(distance);
+        horizontalServo2.setPosition(1-distance);
+    }
+
 }

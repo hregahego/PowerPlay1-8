@@ -25,7 +25,7 @@ public class Turret implements Subsystem {
     public double rotation = 0;
 
     private final double ticks_to_degrees = 1.0;
-    private final double MAX_POWER = 1.0;
+    public double MAX_POWER = 1.0;
 
     private double PID;
 
@@ -52,8 +52,6 @@ public class Turret implements Subsystem {
 
         if (Math.abs(currentAngle - targetAngle) < deadzone) {
             setTurretPower(0);
-        } else if (Math.abs(rotation) > 0.1) {
-            setTurretPower(rotation * ff);
         } else {
             setTurretPower(PIDController(targetAngle, currentAngle));
         }

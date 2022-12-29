@@ -31,6 +31,8 @@ dependencies {
 
     implementation 'com.acmerobotics.roadrunner:core:0.5.6'
 
+    implementation 'org.openftc:easyopencv:1.5.2'
+
     implementation 'org.ejml:ejml-all:0.41'
 
     implementation 'com.acmerobotics.dashboard:dashboard:0.3.8'
