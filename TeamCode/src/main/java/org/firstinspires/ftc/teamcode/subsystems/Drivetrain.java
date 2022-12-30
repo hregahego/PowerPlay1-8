@@ -57,15 +57,15 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class Drivetrain extends MecanumDrive implements Subsystem {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(7.4, 0, 0.5);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7.5, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.5, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.3, 0, 0);
 
-    public static double LATERAL_MULTIPLIER = 1.0;
+    public static double LATERAL_MULTIPLIER = 1.35;
 
     public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1.3;
+    public static double VY_WEIGHT = 1; //1.3;
     //Need to retune
-    public static double OMEGA_WEIGHT = 0.7;
+    public static double OMEGA_WEIGHT = 1; // 0.7;
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 

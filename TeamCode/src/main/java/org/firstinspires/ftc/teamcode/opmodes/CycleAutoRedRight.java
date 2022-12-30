@@ -46,9 +46,10 @@ public class CycleAutoRedRight extends LinearOpMode {
         robot.intake.dropArm();
         detector.init(hardwareMap, telemetry);
 //        robot.lift.setOpmode("auto");
+        Drivetrain drive = new Drivetrain(hardwareMap);
 
         TrajectorySequence parking1 = robot.drive.trajectorySequenceBuilder(START_POSE)
-                .setVelConstraint(robot.drive.getVelocityConstraint(20, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .setVelConstraint(robot.drive.getVelocityConstraint(40, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
                 //.setReversed(true)
                 // Preplaced
                 //.strafeLeft(60)
@@ -56,61 +57,61 @@ public class CycleAutoRedRight extends LinearOpMode {
                 .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
                     robot.lift.setTargetHeight(liftHigh);
                 })
-//                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-//                    robot.turret.setTargetAngle(turretRight/2);
-//                    robot.intake.setArmPos(0.55);
-//                })
-//                .waitSeconds(0.2)
-//                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
-//                    robot.lift.setHorizontalPosition(hzslidesout);
-//                    robot.intake.openClaw();
-//                })
-//                .waitSeconds(0.5)
-//                .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {
-//                    robot.turret.setTargetAngle(turretBack);
-//                    robot.lift.setHorizontalPosition(hzslidesin);
-//                })
-//
-//                // Cycle #1
-//
-//                .addTemporalMarker(() -> {
-//                })
-//                .setReversed(false)
-//                .waitSeconds(0.9)
-//                .setVelConstraint(robot.drive.getVelocityConstraint(20, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
-//                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
-//                    robot.lift.setTargetHeight(7.5);
-//                    robot.intake.centerArm();
-//                })
-//                .waitSeconds(0.2)
-//                .lineToLinearHeading(new Pose2d(52, -12, Math.toRadians(180)))
-//                //pick up cone
-//                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
-//                    robot.lift.setHorizontalPosition(hzslidesout);
-//                })
-//                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {
-//                    robot.intake.closeClaw();
-//                })
-//                .waitSeconds(0.5)
-//                .addTemporalMarker(() -> {
-//                    robot.lift.setTargetHeight(liftLow);
-//                    robot.lift.setHorizontalPosition(hzslidesin);
-//                    robot.turret.setTargetAngle(575);
-//                })
-//                .waitSeconds(0.7)
-//                .addTemporalMarker(() -> {
-//                    robot.lift.setHorizontalPosition(hzslidesout);
-//                })
-//                .waitSeconds(1)
-//                .addTemporalMarker(() -> {
-//                    robot.lift.setTargetHeight(liftLow);
-//                    robot.intake.fullyOpenClaw();
-//                })
-//                .waitSeconds(0.3)
-//                .addTemporalMarker(() -> {
-//                    robot.turret.setTargetAngle(turretBack);
-//                })
-//                .waitSeconds(0.3)
+                .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
+                    robot.turret.setTargetAngle(turretRight/2);
+                    robot.intake.setArmPos(0.55);
+                })
+                .waitSeconds(0.2)
+                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                    robot.lift.setHorizontalPosition(hzslidesout);
+                    robot.intake.openClaw();
+                })
+                .waitSeconds(0.5)
+                .UNSTABLE_addTemporalMarkerOffset(0.8, () -> {
+                    robot.turret.setTargetAngle(turretBack);
+                    robot.lift.setHorizontalPosition(hzslidesin);
+                })
+
+                // Cycle #1
+
+                .addTemporalMarker(() -> {
+                })
+                .setReversed(false)
+                .waitSeconds(0.9)
+                .setVelConstraint(robot.drive.getVelocityConstraint(20, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .UNSTABLE_addTemporalMarkerOffset(-0.5, () -> {
+                    robot.lift.setTargetHeight(7.5);
+                    robot.intake.centerArm();
+                })
+                .waitSeconds(0.2)
+                .lineToLinearHeading(new Pose2d(52, -12, Math.toRadians(180)))
+                //pick up cone
+                .UNSTABLE_addTemporalMarkerOffset(0.1, () -> {
+                    robot.lift.setHorizontalPosition(hzslidesout);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0.4, () -> {
+                    robot.intake.closeClaw();
+                })
+                .waitSeconds(0.5)
+                .addTemporalMarker(() -> {
+                    robot.lift.setTargetHeight(liftLow);
+                    robot.lift.setHorizontalPosition(hzslidesin);
+                    robot.turret.setTargetAngle(575);
+                })
+                .waitSeconds(0.7)
+                .addTemporalMarker(() -> {
+                    robot.lift.setHorizontalPosition(hzslidesout);
+                })
+                .waitSeconds(1)
+                .addTemporalMarker(() -> {
+                    robot.lift.setTargetHeight(liftLow);
+                    robot.intake.fullyOpenClaw();
+                })
+                .waitSeconds(0.3)
+                .addTemporalMarker(() -> {
+                    robot.turret.setTargetAngle(turretBack);
+                })
+                .waitSeconds(0.3)
 
 //                // Cycle #2
 //
@@ -286,19 +287,15 @@ public class CycleAutoRedRight extends LinearOpMode {
 
         if (parkingPos == SleeveDetectionPipeline.Color.MAGENTA) {
             robot.drive.followTrajectorySequenceAsync(parking1);
-            detector.stop();
         } else if (parkingPos == SleeveDetectionPipeline.Color.BLUE) {
             robot.drive.followTrajectorySequenceAsync(parking1);
-            detector.stop();
         } else if (parkingPos == SleeveDetectionPipeline.Color.RED) {
             robot.drive.followTrajectorySequenceAsync(parking1);
-            detector.stop();
         }
 
         while (opModeIsActive()) {
-            Drivetrain drive = new Drivetrain(hardwareMap);
-            drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             Pose2d poseEstimate = drive.getPoseEstimate();
+            //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             telemetry.addData("turret pos", robot.turret.getCurrentAngle());
             telemetry.addData("turret target", robot.turret.getTargetAngle());
 //            telemetry.addData("opmode", robot.lift.getOpmode());
@@ -308,7 +305,6 @@ public class CycleAutoRedRight extends LinearOpMode {
             telemetry.addData("heading", poseEstimate.getHeading());
             telemetry.update();
             robot.update();
-            telemetry.update();
             drive.update();
         }
     }
