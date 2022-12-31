@@ -17,7 +17,7 @@ public class Intake implements Subsystem {
     //Arm constants
     public double liftedArm = 1;
     public double droppedArm = 0.1;
-    public double centeredArm = 0.6;
+    public double centeredArm = 0.52;
 
     //Claw constants
     private double openedClaw = 0.49;

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
 import androidx.annotation.NonNull;
-
+import java.lang.Math;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
@@ -57,8 +57,10 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class Drivetrain extends MecanumDrive implements Subsystem {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.5, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.3, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.76, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.8, 0, 0);
+    public double lrks = -0.5;
+    public String voltagemode = "auto";
 
     public static double LATERAL_MULTIPLIER = 1.35;
 
@@ -304,10 +306,29 @@ public class Drivetrain extends MecanumDrive implements Subsystem {
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
-        leftFront.setPower(v);
-        leftRear.setPower(v1);
-        rightRear.setPower(v2);
-        rightFront.setPower(v3);
+        if (voltagemode == "auto") {
+            double lfks = 0;
+            double rrks = 0;
+            double rfks = 0;
+            double voltagecompmultiplier = 12/batteryVoltageSensor.getVoltage();
+            double maxlf = Math.abs(v+Math.signum(v)* lfks);
+            double maxlr = Math.abs(v1+Math.signum(v1)* lrks);
+            double maxrr = Math.abs(v2+Math.signum(v2)* rrks);
+            double maxrf = Math.abs(v3+Math.signum(v3)* rfks);
+            double max = Math.max(maxlf, maxlr);
+            double max2 = Math.max(maxrr, maxrf);
+            double absmax = Math.max(max, max2);
+            double scaledown = 1/absmax;
+            leftFront.setPower((v + Math.signum(v)* lfks) * scaledown * voltagecompmultiplier);
+            leftRear.setPower((v1 + Math.signum(v1)* lrks) * scaledown * voltagecompmultiplier);
+            rightRear.setPower((v2 + Math.signum(v2)* rrks) * scaledown * voltagecompmultiplier);
+            rightFront.setPower((v3 + Math.signum(v3)* rfks) * scaledown * voltagecompmultiplier);
+        }else if (voltagemode == "teleop"){
+            leftFront.setPower(v);
+            leftRear.setPower(v1);
+            rightRear.setPower(v2);
+            rightFront.setPower(v3);
+        }
     }
 
     @Override

@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.opmodes;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
-import org.firstinspires.ftc.teamcode.subsystems.SleeveDetectionPipeline;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
+import org.firstinspires.ftc.teamcode.subsystems.SleeveDetectionPipeline;
 import org.firstinspires.ftc.teamcode.subsystems.SleeveDetector;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous
-public class CycleAutoRedRight extends LinearOpMode {
+public class CycleAutoRedRightLow extends LinearOpMode {
     private double startingx = 33;
     private double startingy = -64;
     private double startingheading = Math.toRadians(180);
-    Pose2d START_POSE = new Pose2d(startingx, startingy, startingheading);
+    Pose2d START_POSE = new Pose2d(33,-64,Math.toRadians(180));
+    Pose2d Preload_POSE = new Pose2d(33,-8,Math.toRadians(180));
     Robot robot;
     SleeveDetector detector = new SleeveDetector();
     SleeveDetectionPipeline.Color parkingPos = SleeveDetectionPipeline.Color.BLUE;
@@ -37,7 +38,7 @@ public class CycleAutoRedRight extends LinearOpMode {
     public double turretRight = 990;
 
     //change after tuning horizontal slides
-    public double hzslidesout = 1.3;
+    public double hzslidesout = 1.0;
     public double hzslidesin = 0.3;
 
 
@@ -52,9 +53,9 @@ public class CycleAutoRedRight extends LinearOpMode {
         detector.init(hardwareMap, telemetry);
         Drivetrain drive = new Drivetrain(hardwareMap);
         robot.turret.MAX_POWER = 0.5;
-        robot.drive.voltagemode = "teleop";
+        robot.drive.voltagemode = "auto";
         TrajectorySequence preload = robot.drive.trajectorySequenceBuilder(START_POSE)
-                .setVelConstraint(robot.drive.getVelocityConstraint(40, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
+                .setVelConstraint(robot.drive.getVelocityConstraint(30, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
 
                 // Preplaced
 
@@ -66,7 +67,7 @@ public class CycleAutoRedRight extends LinearOpMode {
                     robot.lift.setTargetHeight(liftHigh);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
-                    robot.turret.setTargetAngle(-115);
+                    robot.turret.setTargetAngle(-135);
                     robot.intake.setArmPos(0.55);
                 })
                 .UNSTABLE_addTemporalMarkerOffset(1.3, () -> {
@@ -78,25 +79,27 @@ public class CycleAutoRedRight extends LinearOpMode {
                 })
                 .waitSeconds(0.5)
                 .UNSTABLE_addTemporalMarkerOffset(2.0, () -> {
-                    robot.turret.setTargetAngle(turretBack);
+                    robot.lift.setHorizontalPosition(hzslidesin);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(2.3, () -> {
+                    robot.lift.setTargetHeight(liftIdle);
                 })
                 .waitSeconds(0.5)
-                .UNSTABLE_addTemporalMarkerOffset(2.3, () -> {
-                    robot.lift.setHorizontalPosition(hzslidesin);
+                .UNSTABLE_addTemporalMarkerOffset(2.5, () -> {
+                    robot.turret.setTargetAngle(turretBack);
                 })
                 .build();
 
-        TrajectorySequence Cycling = robot.drive.trajectorySequenceBuilder(START_POSE)
-                .setVelConstraint(robot.drive.getVelocityConstraint(40, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
-                .setReversed(false)
+                //Cycle 1
+
+        TrajectorySequence Cycle = robot.drive.trajectorySequenceBuilder(relocalize())
                 .waitSeconds(2.5)
-                .setVelConstraint(robot.drive.getVelocityConstraint(20, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
-                    robot.lift.setTargetHeight(7.5);
-                })
-                .waitSeconds(0.2)
-                .lineToLinearHeading(new Pose2d(60, -5, Math.toRadians(180)))
+//                .back(18)
+                .lineToLinearHeading(new Pose2d(45, -7, Math.toRadians(180)))
                 //pick up cone
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                    robot.lift.setTargetHeight(7);
+                })
                 .UNSTABLE_addTemporalMarkerOffset(0.3, () -> {
                     robot.lift.setHorizontalPosition(hzslidesout);
                 })
@@ -107,18 +110,20 @@ public class CycleAutoRedRight extends LinearOpMode {
                 .addTemporalMarker(() -> {
                     robot.lift.setTargetHeight(liftLow);
                     robot.lift.setHorizontalPosition(hzslidesin);
-                    robot.turret.setTargetAngle(575);
+                })
+                .addTemporalMarker(() -> {
+                    robot.turret.setTargetAngle(150);
                 })
                 .waitSeconds(0.7)
                 .addTemporalMarker(() -> {
-                    robot.lift.setHorizontalPosition(hzslidesout);
+                    robot.lift.setHorizontalPosition(0.6);
                 })
                 .waitSeconds(1)
                 .addTemporalMarker(() -> {
                     robot.lift.setTargetHeight(liftLow);
                     robot.intake.fullyOpenClaw();
                 })
-                .waitSeconds(0.3)
+                .waitSeconds(1)
                 .addTemporalMarker(() -> {
                     robot.turret.setTargetAngle(turretBack);
                 })
@@ -130,19 +135,14 @@ public class CycleAutoRedRight extends LinearOpMode {
 
         waitForStart();
 
-        robot.drive.followTrajectorySequenceAsync(preload);
-        //relocalize();
-        robot.drive.followTrajectorySequenceAsync(Cycling);
-        //relocalize();
-        robot.drive.followTrajectorySequenceAsync(Cycling);
-
+        robot.drive.followTrajectorySequence(preload);
+        robot.drive.followTrajectorySequence(Cycle);
 
         while (opModeIsActive()) {
             Pose2d poseEstimate = robot.drive.getPoseEstimate();
             //drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             telemetry.addData("turret pos", robot.turret.getCurrentAngle());
             telemetry.addData("turret target", robot.turret.getTargetAngle());
-//            telemetry.addData("opmode", robot.lift.getOpmode());
             telemetry.addData("slide pos", robot.lift.getCurrentHeight());
             telemetry.addData("x", poseEstimate.getX());
             telemetry.addData("y", poseEstimate.getY());
@@ -152,15 +152,15 @@ public class CycleAutoRedRight extends LinearOpMode {
             drive.update();
         }
     }
-
-    private void relocalize() {
-        Pose2d poseEstimate = robot.drive.getPoseEstimate();
-        double xpos = startingx + poseEstimate.getX();
-        double ypos = startingy + poseEstimate.getY();
-        double headingpos = startingheading + poseEstimate.getHeading();
-        robot.drive.setPoseEstimate(new Pose2d(xpos, ypos, headingpos));
+    private Pose2d relocalize() {
+        Pose2d posemeasure = robot.drive.getPoseEstimate();
+        double xpos = startingx + posemeasure.getX();
+        double ypos = startingy + posemeasure.getY();
+        double headingpos = startingheading + posemeasure.getHeading();
+        Pose2d currentpos = new Pose2d(xpos, ypos, headingpos);
         startingx = xpos;
         startingy = ypos;
         startingheading = headingpos;
+        return currentpos;
     }
 }

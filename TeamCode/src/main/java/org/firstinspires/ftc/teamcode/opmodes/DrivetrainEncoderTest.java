@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_ACCEL;
 import static org.firstinspires.ftc.teamcode.drive.DriveConstants.MAX_VEL;
@@ -42,7 +42,7 @@ import java.util.Objects;
  */
 @Config
 @Autonomous(group = "drive")
-public class    ManualFeedforwardTuner extends LinearOpMode {
+public class DrivetrainEncoderTest extends LinearOpMode {
     public static double DISTANCE = 72; // in
 
     private FtcDashboard dashboard = FtcDashboard.getInstance();
@@ -64,16 +64,16 @@ public class    ManualFeedforwardTuner extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        if (RUN_USING_ENCODER) {
-            RobotLog.setGlobalErrorMsg("Feedforward constants usually don't need to be tuned " +
-                    "when using the built-in drive motor velocity PID.");
-        }
+//        if (RUN_USING_ENCODER) {
+//            RobotLog.setGlobalErrorMsg("Feedforward constants usually don't need to be tuned " +
+//                    "when using the built-in drive motor velocity PID.");
+//        }
 
         Telemetry telemetry = new MultipleTelemetry(this.telemetry, dashboard.getTelemetry());
 
         drive = new SampleMecanumDrive(hardwareMap);
 
-        mode = Mode.TUNING_MODE;
+        mode = Mode.DRIVER_MODE;
 
         NanoClock clock = NanoClock.system();
 

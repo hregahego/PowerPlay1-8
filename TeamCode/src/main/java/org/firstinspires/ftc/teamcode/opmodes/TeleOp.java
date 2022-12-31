@@ -93,6 +93,7 @@ public class TeleOp extends LinearOpMode {
         robot.init();
         robotState = robotState.INTAKING;
         robot.intake.openClaw();
+        robot.drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.turret.tmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armup = true;
         robot.turret.MAX_POWER = 1;
@@ -100,6 +101,7 @@ public class TeleOp extends LinearOpMode {
         switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
         switchNormal = switchNormal.Idle;
         switchStack = switchStack.Idle;
+        robot.drive.voltagemode = "teleop";
         double TurretPower = gamepad2.right_stick_x;
 
 //Drivetrain
@@ -173,7 +175,6 @@ public class TeleOp extends LinearOpMode {
                                 switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
                                 timer.reset();
                             }
-                            break;
                     }
 
                     switch(switchStack) {
@@ -691,13 +692,17 @@ public class TeleOp extends LinearOpMode {
                                 switchNormal = switchNormal.FirstActions;
                                 timer.reset();
                             }
+                            break;
                         case FirstActions:
+                            running = false;
+                            robot.turret.MAX_POWER=1;
                             robot.lift.setTargetHeight(idle);
                             robot.intake.liftArm();
                             robot.intake.closeClaw();
                             robot.lift.setHorizontalPosition(horizontallifted);
                             switchNormal = switchNormal.SecondActions;
                             timer.reset();
+                            break;
                         case SecondActions:
                             if (timer.milliseconds() > 700) {
                                 robot.turret.setTargetAngle(front);
@@ -711,10 +716,13 @@ public class TeleOp extends LinearOpMode {
                         case Idle:
                             if (gamepad1.a && gamepad1.start == false) {
                                 switchStack = switchStack.FirstActions;
+                                running=false;
                                 timer.reset();
                             }
                             break;
                         case FirstActions:
+                            robot.turret.MAX_POWER=1;
+                            running = false;
                             robot.lift.setTargetHeight(idle);
                             robot.intake.liftArm();
                             robot.intake.closeClaw();
@@ -731,21 +739,31 @@ public class TeleOp extends LinearOpMode {
                                 timer.reset();
                             }
                     }
-                    if (running == true) {
+                    if(gamepad1.left_bumper){
+                        running = true;
                         autotimer.reset();
-                        robot.lift.setHorizontalPosition(horizontalextended);
-                        if (autotimer.milliseconds() > 300 && autotimer.milliseconds() < 500) {
+                    }
+                    if(gamepad2.right_bumper){
+                        running = false;
+                    }
+                    if (running == true) {
+                        if(timer.milliseconds()<300) {
+                            robot.turret.MAX_POWER = 0.6;
+                            robot.intake.centerArm();
+                            robot.intake.fullyOpenClaw();
+                            robot.lift.setHorizontalPosition(horizontalextended);
+                        }else if (autotimer.milliseconds() > 300 && autotimer.milliseconds() < 400) {
                             robot.intake.closeClaw();
-                        } else if (autotimer.milliseconds() > 500 && autotimer.milliseconds() < 1300) {
+                        } else if (autotimer.milliseconds() > 700 && autotimer.milliseconds() < 1300) {
                             robot.lift.setHorizontalPosition(horizontalback);
                             robot.lift.setTargetHeight(up);
-                            robot.intake.setArmPos(0.55);
+                            robot.intake.setArmPos(0.6);
                             robot.turret.setTargetAngle(back);
-                        } else if (autotimer.milliseconds() > 1300 && autotimer.milliseconds() < 1800) {
-                            robot.lift.setHorizontalPosition(horizontalback);
-                        } else if (autotimer.milliseconds() > 1800 && autotimer.milliseconds() < 1900) {
+                        } else if (autotimer.milliseconds() > 1600 && autotimer.milliseconds() < 1700) {
+                            robot.lift.setHorizontalPosition(0.6);
+                        } else if (autotimer.milliseconds() > 1900 && autotimer.milliseconds() < 2100) {
                             robot.lift.setTargetHeight(robot.lift.getCurrentHeight() - droppedvalue);
-                        } else if (autotimer.milliseconds() > 1900 && autotimer.milliseconds() < 2800) {
+                        } else if (autotimer.milliseconds() > 2100 && autotimer.milliseconds() < 2800) {
                             robot.intake.openClaw();
                             robot.intake.centerArm();
                             robot.lift.setTargetHeight(200);
@@ -776,6 +794,7 @@ public class TeleOp extends LinearOpMode {
             telemetry.addData("horzontalservopos", robot.lift.horizontalServo1.getPosition());
             telemetry.addData("timer2", timer2);
             telemetry.addData("autotimer", autotimer.milliseconds());
+            telemetry.addData("running?", running);
             robot.update();
         }
     }
