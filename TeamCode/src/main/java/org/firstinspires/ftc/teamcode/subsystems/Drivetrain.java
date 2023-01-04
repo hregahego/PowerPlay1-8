@@ -57,12 +57,12 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class Drivetrain extends MecanumDrive implements Subsystem {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.76, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.8, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.1, 0, 0.01);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.12, 0, 0);
     public double lrks = -0.5;
     public String voltagemode = "auto";
 
-    public static double LATERAL_MULTIPLIER = 1.35;
+    public static double LATERAL_MULTIPLIER = 1.4705882352941176470588235294118;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1; //1.3;
@@ -97,10 +97,10 @@ public class Drivetrain extends MecanumDrive implements Subsystem {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-//        imu = hardwareMap.get(BNO055IMU.class, "imu");
-//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-//        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-//        imu.initialize(parameters);
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+        imu.initialize(parameters);
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)

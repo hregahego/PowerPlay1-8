@@ -21,7 +21,7 @@ public class TurretPIDTest2 extends LinearOpMode{
 
     public static int TARGET_POS = 0;
 
-    public static double kP = 0, kI = 0, kD = 0, ff = 0;
+    public static double kP = 1, kI = 0, kD = 0, ff = 0.3;
 
     public void runOpMode() {
         robot = new Robot(telemetry, hardwareMap);

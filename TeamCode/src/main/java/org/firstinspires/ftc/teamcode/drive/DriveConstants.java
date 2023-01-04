@@ -22,7 +22,6 @@ public class DriveConstants {
      */
     public static final double TICKS_PER_REV = 384.5;
     public static final double MAX_RPM = 435;
-
     /*
      * Set RUN_USING_ENCODER to true to enable built-in hub velocity control using drive encoders.
      * Set this flag to false if drive encoders are not present and an alternative localization
@@ -45,7 +44,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 48/25.4; // in
     public static double GEAR_RATIO = 13.0/11.0 * 0.7247330869166; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 10.25; // in
+    public static double TRACK_WIDTH = 12.42; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -53,15 +52,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 0.0162;
-    public static double kA = 0.0021;
+    public static double kV = 0.015412518;
+    public static double kA = 0.003612518;
     public static double kStatic = 0;
-    /*
-    public static double kV = 0.013;
-    public static double kA = 0.0025;
-    public static double kStatic = 0.08;
-    replace maybe?
-     */
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
