@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.acmerobotics.dashboard.FtcDashboard;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Robot;
 
@@ -42,10 +43,10 @@ public class StrafingTest extends LinearOpMode {
 //                drivetrain.leftRear.setPower(0);
             }
             telemetry.addData("time", timer);
-            telemetry.addData("Velocity Left Front", drivetrain.leftFront.getVelocity());
-            telemetry.addData("Velocity Right Front", drivetrain.rightFront.getVelocity());
-            telemetry.addData("Velocity Left Rear", drivetrain.leftRear.getVelocity());
-            telemetry.addData("Velocity Right Rear", drivetrain.rightRear.getVelocity());
+            telemetry.addData("Velocity Left Front", drivetrain.leftFront.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Velocity Right Front", drivetrain.rightFront.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Velocity Left Rear", drivetrain.leftRear.getCurrent(CurrentUnit.AMPS));
+            telemetry.addData("Velocity Right Rear", drivetrain.rightRear.getCurrent(CurrentUnit.AMPS));
 
             telemetry.update();
 

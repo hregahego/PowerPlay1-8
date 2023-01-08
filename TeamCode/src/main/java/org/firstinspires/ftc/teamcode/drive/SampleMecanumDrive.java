@@ -53,9 +53,9 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
  */
 @Config
 public class SampleMecanumDrive extends MecanumDrive {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0.3, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.79, 0, 0);
-    public static double LATERAL_MULTIPLIER = 1.35;
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(5.06, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6.6, 0, 0);
+    public static double LATERAL_MULTIPLIER = 1.4705882352941176470588235294118;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -89,10 +89,10 @@ public class SampleMecanumDrive extends MecanumDrive {
         }
 
         // TODO: adjust the names of the following hardware devices to match your configuration
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
+//        imu = hardwareMap.get(BNO055IMU.class, "imu");
+//        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+//        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
+//        imu.initialize(parameters);
 
         // TODO: If the hub containing the IMU you are using is mounted so that the "REV" logo does
         // not face up, remap the IMU axes so that the z-axis points upward (normal to the floor.)
