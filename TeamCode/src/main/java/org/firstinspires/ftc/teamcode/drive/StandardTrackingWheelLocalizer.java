@@ -13,7 +13,13 @@ import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import java.util.Arrays;
 import java.util.List;
+//89.222      1.00871
+//89.3459     1.00732     avgX: 1.00759
+//89.3966     1.006742
 
+//103.03645   0.8734
+//103.7182    0.8677      avgY: 0.870433
+//103.4139    0.8702
 /*
  * Sample tracking wheel localizer implementation assuming the standard configuration:
  *
@@ -33,11 +39,11 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     public static double WHEEL_RADIUS = 0.6889764; // in
     public static double GEAR_RATIO = 1; // output (wheel) speed / input (encoder) speed
 
-    public static double LATERAL_DISTANCE = 4.88; // in; distance between the left and right wheels
+    public static double LATERAL_DISTANCE = 4.211855; // in; distance between the left and right wheels
     public static double FORWARD_OFFSET = -2.5; // in; offset of the lateral wheel
 
-    public static double X_MULTIPLIER = 1.01215515361029883348439419651; // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 1.17; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 1.015; // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 1.0175; // Multiplier in the Y direction
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 
