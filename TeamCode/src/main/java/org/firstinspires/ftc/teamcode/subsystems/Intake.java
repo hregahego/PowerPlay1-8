@@ -41,6 +41,8 @@ public class Intake implements Subsystem {
         armServo2 = hardwareMap.get(Servo.class, "arm2");
         intakeServo1 = hardwareMap.get(CRServo.class, "intake1");
         intakeServo2 = hardwareMap.get(CRServo.class, "intake2");
+        intakeServo3 = hardwareMap.get(CRServo.class, "intake3");
+        intakeServo4 = hardwareMap.get(CRServo.class, "intake4");
         colorRangeSensor = hardwareMap.get(RevColorSensorV3.class, "distanceSensor");
     }
 
@@ -64,15 +66,15 @@ public class Intake implements Subsystem {
     public void intake(double power){
         intakeServo1.setPower(power);
         intakeServo2.setPower(-power);
-//        intakeServo3.setPower(-power);
-//        intakeServo4.setPower(power);
+        intakeServo3.setPower(-power);
+        intakeServo4.setPower(power);
     }
 
     public void stopIntake(){
         intakeServo1.setPower(0);
         intakeServo2.setPower(0);
-//        intakeServo3.setPower(0);
-//        intakeServo4.setPower(0);
+        intakeServo3.setPower(0);
+        intakeServo4.setPower(0);
     }
 
     public void setClawPos(double position){
