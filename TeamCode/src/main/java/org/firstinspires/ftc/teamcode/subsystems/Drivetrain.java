@@ -58,8 +58,8 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 
 @Config
 public class Drivetrain extends MecanumDrive implements Subsystem {
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(5.06, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6.6, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
     public double lrks = 0;
     public String voltagemode = "auto";
 

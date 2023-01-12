@@ -23,6 +23,8 @@ public class TurretPIDTest2 extends LinearOpMode{
 
     public static double kP = 1, kI = 0, kD = 0, ff = 0.3;
 
+    private double prev_time = System.currentTimeMillis();
+
     public void runOpMode() {
         robot = new Robot(telemetry, hardwareMap);
         timer = new ElapsedTime();
@@ -40,6 +42,10 @@ public class TurretPIDTest2 extends LinearOpMode{
 
         while (!isStopRequested()) {
             robot.lift.setTargetHeight(650);
+
+            double dt = System.currentTimeMillis() - prev_time;
+            prev_time = System.currentTimeMillis();
+
             tele.addData("turret goal", robot.turret.getTargetAngle());
             tele.addData("turret pos", robot.turret.getCurrentAngle());
             tele.addData("turret PID", robot.turret.getPID());

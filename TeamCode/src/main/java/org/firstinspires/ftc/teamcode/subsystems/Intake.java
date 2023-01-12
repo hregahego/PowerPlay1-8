@@ -16,12 +16,12 @@ public class Intake implements Subsystem {
 
     //Arm constants
     public double liftedArm = 1;
-    public double droppedArm = 0.1;
+    public double droppedArm = 0.43;
     public double centeredArm = 0.52;
 
     //Claw constants
-    private double openedClaw = 0.49;
-    private double closedClaw = 0.242;
+    private double openedClaw = 0.44;
+    private double closedClaw = 0.22;
     private double fullyOpen = 0.6;
 
     public Servo clawServoB;

@@ -20,8 +20,8 @@ import com.acmerobotics.dashboard.FtcDashboard;
 @Config
 @Autonomous
 public class CycleAutoRedRightLow extends LinearOpMode {
-    Pose2d START_POSE = new Pose2d(33,-64,Math.toRadians(180));
-    Pose2d Preload_POSE = new Pose2d(33,-8.5,Math.toRadians(180));
+    Pose2d START_POSE = new Pose2d(38,-64,Math.toRadians(180));
+    Pose2d Preload_POSE = new Pose2d(38,-12,Math.toRadians(180));
     Robot robot;
     SleeveDetector detector = new SleeveDetector();
     SleeveDetectionPipeline.Color parkingPos = SleeveDetectionPipeline.Color.BLUE;
@@ -51,39 +51,33 @@ public class CycleAutoRedRightLow extends LinearOpMode {
         sleep(1500);
         robot.intake.dropArm();
         detector.init(hardwareMap, telemetry);
-        Drivetrain drive = new Drivetrain(hardwareMap);
-        robot.turret.MAX_POWER = 0.5;
+
+        robot.turret.MAX_POWER = 0.65;
 //        robot.drive.voltagemode = "teleop";
 
         TrajectorySequence preload = robot.drive.trajectorySequenceBuilder(START_POSE)
                 .setVelConstraint(robot.drive.getVelocityConstraint(40, Math.toRadians(180), DriveConstants.TRACK_WIDTH))
 
                 // Preplaced
-
-                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> robot.intake.centerArm())
-                .lineToLinearHeading(Preload_POSE)
-                .UNSTABLE_addTemporalMarkerOffset(0.2, () ->
-                        robot.lift.setTargetHeight(liftHigh)
-                )
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> {
-                    robot.turret.setTargetAngle(-125);
-                    robot.intake.setArmPos(0.58);
+                .UNSTABLE_addTemporalMarkerOffset(0.0, () -> {
+                    robot.intake.centerArm();
                 })
-                .waitSeconds(2.0)
-                .UNSTABLE_addTemporalMarkerOffset(0.5, () -> {
+                .lineToLinearHeading(Preload_POSE)
+                .UNSTABLE_addTemporalMarkerOffset(-1.5, () -> {
+                    robot.lift.setTargetHeight(liftHigh);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(2, () -> {
+                    robot.turret.setTargetAngle(530);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(0, () -> {
                     robot.lift.setHorizontalPosition(hzslidesout);
                 })
-                .UNSTABLE_addTemporalMarkerOffset(1.0, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(1, () -> {
                     robot.intake.openClaw();
                 })
-                .UNSTABLE_addTemporalMarkerOffset(2.0, () -> {
-                    robot.turret.setTargetAngle(turretBack);
-                })
-                .UNSTABLE_addTemporalMarkerOffset(2.7, () -> {
+                .UNSTABLE_addTemporalMarkerOffset(0.6, () -> {
                     robot.lift.setHorizontalPosition(hzslidesin);
-                    robot.lift.setTargetHeight(180);
                 })
-                .waitSeconds(3.5)
                 .build();
 
         //Cycle 1
@@ -131,7 +125,7 @@ public class CycleAutoRedRightLow extends LinearOpMode {
         waitForStart();
 
         robot.drive.followTrajectorySequenceAsync(preload);
-        robot.drive.followTrajectorySequenceAsync(cycleLow);
+//        robot.drive.followTrajectorySequenceAsync(cycleLow);
 
         while (opModeIsActive()) {
             Pose2d poseEstimate = robot.drive.getPoseEstimate();

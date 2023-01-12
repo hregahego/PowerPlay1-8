@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.subsystems.Robot;
 public class TurretPIDTest extends LinearOpMode{
     private Robot robot;
     private ElapsedTime timer;
+    private double prev_time = System.currentTimeMillis();
     public enum ArmPos {
         LEFT,
         RIGHT
@@ -27,6 +28,11 @@ public class TurretPIDTest extends LinearOpMode{
         timer.reset();
         while(!isStopRequested()) {
             robot.lift.setTargetHeight(400);
+
+            double dt = System.currentTimeMillis() - prev_time;
+            prev_time = System.currentTimeMillis();
+
+            telemetry.addData("loop time", dt);
             telemetry.addData("turret goal", robot.turret.getTargetAngle());
             telemetry.addData("turret pos", robot.turret.getCurrentAngle());
             telemetry.addData("turret power", robot.turret.getPID());

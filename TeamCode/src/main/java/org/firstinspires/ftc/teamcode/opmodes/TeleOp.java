@@ -38,7 +38,7 @@ public class TeleOp extends LinearOpMode {
     private double droppedvalue = 150;
     private boolean armup = true;
     private boolean lowheight = false;
-    private double horizontalback = 0.54;
+    private double horizontalback = 0.44;
     private double horizontallifted = 0.5;
     private double horizontalmiddle = 0.61;
     private double horizontalextended = 1;
@@ -47,8 +47,11 @@ public class TeleOp extends LinearOpMode {
     private boolean running = false;
     private double highposarm = 0.6;
 
+    private double prev_time = System.currentTimeMillis();
+
     public enum robotState {
         IDLE,
+        IDLE2,
         INTAKING,
         INTAKING2,
         GRABBED,
@@ -104,8 +107,16 @@ public class TeleOp extends LinearOpMode {
         robot.drive.voltagemode = "teleop";
         double TurretPower = gamepad2.right_stick_x;
 
+        double distance;
+
 //Drivetrain
         while (!isStopRequested() && opModeIsActive()) {
+
+            double dt = System.currentTimeMillis() - prev_time;
+            prev_time = System.currentTimeMillis();
+
+            telemetry.addData("loop time", dt);
+
 
             //anti-tip + regular teleop code - ONLY ON PITCH RIGHT NOW
             double antiTipMulti = 1;
@@ -144,38 +155,38 @@ public class TeleOp extends LinearOpMode {
             switch (robotMode) {
                 case NORMAL:
                     //Switching Modes
-                    switch(switchToAUTOCYCLE) {
-                        case Idle:
-                                if (gamepad1.x) {
-                                    switchToAUTOCYCLE = switchToAUTOCYCLE.FirstActions;
-                                    robot.intake.stopIntake();
-                                }
-                            break;
-                        case FirstActions:
-                            robot.lift.setTargetHeight(idle);
-                            robot.intake.liftArm();
-                            robot.intake.closeClaw();
-                            robot.lift.setHorizontalPosition(horizontallifted);
-                            switchToAUTOCYCLE = switchToAUTOCYCLE.SecondActions;
-                            timer.reset();
-                            break;
-                        case SecondActions:
-                            if (timer.milliseconds() > 700) {
-                                robot.turret.setTargetAngle(front);
-                                switchToAUTOCYCLE = switchToAUTOCYCLE.ThirdActions;
-                                timer.reset();
-                            }
-                            break;
-                        case ThirdActions:
-                            if (timer.milliseconds() > 300) {
-                                robot.lift.setTargetHeight(intaking);
-                                robot.intake.centerArm();
-                                robot.intake.fullyOpenClaw();
-                                robotMode = robotMode.AUTOCYCLE;
-                                switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
-                                timer.reset();
-                            }
-                    }
+//                    switch(switchToAUTOCYCLE) {
+//                        case Idle:
+//                                if (gamepad1.x) {
+//                                    switchToAUTOCYCLE = switchToAUTOCYCLE.FirstActions;
+//                                    robot.intake.stopIntake();
+//                                }
+//                            break;
+//                        case FirstActions:
+//                            robot.lift.setTargetHeight(idle);
+//                            robot.intake.liftArm();
+//                            robot.intake.closeClaw();
+//                            robot.lift.setHorizontalPosition(horizontallifted);
+//                            switchToAUTOCYCLE = switchToAUTOCYCLE.SecondActions;
+//                            timer.reset();
+//                            break;
+//                        case SecondActions:
+//                            if (timer.milliseconds() > 700) {
+//                                robot.turret.setTargetAngle(front);
+//                                switchToAUTOCYCLE = switchToAUTOCYCLE.ThirdActions;
+//                                timer.reset();
+//                            }
+//                            break;
+//                        case ThirdActions:
+//                            if (timer.milliseconds() > 300) {
+//                                robot.lift.setTargetHeight(intaking);
+//                                robot.intake.centerArm();
+//                                robot.intake.fullyOpenClaw();
+//                                robotMode = robotMode.AUTOCYCLE;
+//                                switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
+//                                timer.reset();
+//                            }
+                    //}
 
                     switch(switchStack) {
                         case Idle:
@@ -252,12 +263,20 @@ public class TeleOp extends LinearOpMode {
                             robot.lift.setHorizontalPosition(horizontallifted);
                             robot.lift.setTargetHeight(idle);
                             if (timer.milliseconds() > 500) {
-                                if (gamepad1.left_bumper) {
-                                    robot.lift.setTargetHeight(intaking);
+                                if (gamepad1.left_bumper || timer.milliseconds()>1250) {
+                                    robot.intake.dropArm();
                                     timer.reset();
                                     timer2.reset();
-                                    robotState = robotState.INTAKING;
+                                    robotState = robotState.IDLE2;
                                 }
+                            }
+                            break;
+                        case IDLE2:
+                            if (timer.milliseconds()>100){
+                                robot.lift.setTargetHeight(intaking);
+                                robotState = robotState.INTAKING;
+                                timer.reset();
+                                timer2.reset();
                             }
                             break;
                         case INTAKING:
@@ -294,9 +313,9 @@ public class TeleOp extends LinearOpMode {
                             }
                             if (timer.milliseconds() > 500) {
                                 if (gamepad1.left_bumper) {
-                                    robot.lift.setTargetHeight(intaking);
+                                    robot.intake.dropArm();
                                     timer.reset();
-                                    robotState = robotState.INTAKING;
+                                    robotState = robotState.IDLE2;
                                 }
                                 if (gamepad2.dpad_up) {
                                     robot.lift.setTargetHeight(up);
@@ -419,39 +438,39 @@ public class TeleOp extends LinearOpMode {
 
                 case STACK:
                     //Switching Modes
-                    switch(switchToAUTOCYCLE) {
-                        case Idle:
-                                if (gamepad1.x) {
-                                    switchToAUTOCYCLE = switchToAUTOCYCLE.FirstActions;
-                                    timer.reset();
-                                }
-                            break;
-                        case FirstActions:
-                            robot.lift.setTargetHeight(idle);
-                            robot.intake.liftArm();
-                            robot.intake.closeClaw();
-                            robot.lift.setHorizontalPosition(horizontallifted);
-                            switchToAUTOCYCLE = switchToAUTOCYCLE.SecondActions;
-                            timer.reset();
-                            break;
-                        case SecondActions:
-                            if (timer.milliseconds() > 700) {
-                                robot.turret.setTargetAngle(front);
-                                switchToAUTOCYCLE = switchToAUTOCYCLE.ThirdActions;
-                                timer.reset();
-                            }
-                            break;
-                        case ThirdActions:
-                            if (timer.milliseconds() > 300) {
-                                robot.lift.setTargetHeight(intaking);
-                                robot.intake.centerArm();
-                                robot.intake.fullyOpenClaw();
-                                robotMode = robotMode.AUTOCYCLE;
-                                switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
-                                timer.reset();
-                            }
-                            break;
-                    }
+//                    switch(switchToAUTOCYCLE) {
+//                        case Idle:
+//                                if (gamepad1.x) {
+//                                    switchToAUTOCYCLE = switchToAUTOCYCLE.FirstActions;
+//                                    timer.reset();
+//                                }
+//                            break;
+//                        case FirstActions:
+//                            robot.lift.setTargetHeight(idle);
+//                            robot.intake.liftArm();
+//                            robot.intake.closeClaw();
+//                            robot.lift.setHorizontalPosition(horizontallifted);
+//                            switchToAUTOCYCLE = switchToAUTOCYCLE.SecondActions;
+//                            timer.reset();
+//                            break;
+//                        case SecondActions:
+//                            if (timer.milliseconds() > 700) {
+//                                robot.turret.setTargetAngle(front);
+//                                switchToAUTOCYCLE = switchToAUTOCYCLE.ThirdActions;
+//                                timer.reset();
+//                            }
+//                            break;
+//                        case ThirdActions:
+//                            if (timer.milliseconds() > 300) {
+//                                robot.lift.setTargetHeight(intaking);
+//                                robot.intake.centerArm();
+//                                robot.intake.fullyOpenClaw();
+//                                robotMode = robotMode.AUTOCYCLE;
+//                                switchToAUTOCYCLE = switchToAUTOCYCLE.Idle;
+//                                timer.reset();
+//                            }
+//                            break;
+//                    }
 
                     switch(switchNormal) {
                         case Idle:
@@ -686,92 +705,92 @@ public class TeleOp extends LinearOpMode {
 
 
                 case AUTOCYCLE:
-                    switch(switchNormal) {
-                        case Idle:
-                            if (gamepad1.y) {
-                                switchNormal = switchNormal.FirstActions;
-                                timer.reset();
-                            }
-                            break;
-                        case FirstActions:
-                            running = false;
-                            robot.turret.MAX_POWER=1;
-                            robot.lift.setTargetHeight(idle);
-                            robot.intake.liftArm();
-                            robot.intake.closeClaw();
-                            robot.lift.setHorizontalPosition(horizontallifted);
-                            switchNormal = switchNormal.SecondActions;
-                            timer.reset();
-                            break;
-                        case SecondActions:
-                            if (timer.milliseconds() > 700) {
-                                robot.turret.setTargetAngle(front);
-                                robotMode = robotMode.NORMAL;
-                                robotState = robotState.IDLE;
-                                switchNormal = switchNormal.Idle;
-                                timer.reset();
-                            }
-                    }
-                    switch(switchStack) {
-                        case Idle:
-                            if (gamepad1.a && gamepad1.start == false) {
-                                switchStack = switchStack.FirstActions;
-                                running=false;
-                                timer.reset();
-                            }
-                            break;
-                        case FirstActions:
-                            robot.turret.MAX_POWER=1;
-                            running = false;
-                            robot.lift.setTargetHeight(idle);
-                            robot.intake.liftArm();
-                            robot.intake.closeClaw();
-                            robot.lift.setHorizontalPosition(horizontallifted);
-                            switchStack = switchStack.SecondActions;
-                            timer.reset();
-                            break;
-                        case SecondActions:
-                            if (timer.milliseconds() > 700) {
-                                robot.turret.setTargetAngle(back);
-                                robotMode = robotMode.STACK;
-                                robotState = robotState.IDLE;
-                                switchStack = switchStack.Idle;
-                                timer.reset();
-                            }
-                    }
-                    if(gamepad1.left_bumper){
-                        running = true;
-                        autotimer.reset();
-                    }
-                    if(gamepad2.right_bumper){
-                        running = false;
-                    }
-                    if (running == true) {
-                        if(timer.milliseconds()<300) {
-                            robot.turret.MAX_POWER = 0.6;
-                            robot.intake.centerArm();
-                            robot.intake.fullyOpenClaw();
-                            robot.lift.setHorizontalPosition(horizontalextended);
-                        }else if (autotimer.milliseconds() > 300 && autotimer.milliseconds() < 400) {
-                            robot.intake.closeClaw();
-                        } else if (autotimer.milliseconds() > 700 && autotimer.milliseconds() < 1300) {
-                            robot.lift.setHorizontalPosition(horizontalback);
-                            robot.lift.setTargetHeight(up);
-                            robot.intake.setArmPos(0.6);
-                            robot.turret.setTargetAngle(back);
-                        } else if (autotimer.milliseconds() > 1600 && autotimer.milliseconds() < 1700) {
-                            robot.lift.setHorizontalPosition(0.6);
-                        } else if (autotimer.milliseconds() > 1900 && autotimer.milliseconds() < 2100) {
-                            robot.lift.setTargetHeight(robot.lift.getCurrentHeight() - droppedvalue);
-                        } else if (autotimer.milliseconds() > 2100 && autotimer.milliseconds() < 2800) {
-                            robot.intake.openClaw();
-                            robot.intake.centerArm();
-                            robot.lift.setTargetHeight(200);
-                            robot.turret.setTargetAngle(front);
-                        } else if (autotimer.milliseconds() > 2800) {
-                            autotimer.reset();
-                        }
-                    }
+//                    switch(switchNormal) {
+//                        case Idle:
+//                            if (gamepad1.y) {
+//                                switchNormal = switchNormal.FirstActions;
+//                                timer.reset();
+//                            }
+//                            break;
+//                        case FirstActions:
+//                            running = false;
+//                            robot.turret.MAX_POWER=1;
+//                            robot.lift.setTargetHeight(idle);
+//                            robot.intake.liftArm();
+//                            robot.intake.closeClaw();
+//                            robot.lift.setHorizontalPosition(horizontallifted);
+//                            switchNormal = switchNormal.SecondActions;
+//                            timer.reset();
+//                            break;
+//                        case SecondActions:
+//                            if (timer.milliseconds() > 700) {
+//                                robot.turret.setTargetAngle(front);
+//                                robotMode = robotMode.NORMAL;
+//                                robotState = robotState.IDLE;
+//                                switchNormal = switchNormal.Idle;
+//                                timer.reset();
+//                            }
+//                    }
+//                    switch(switchStack) {
+//                        case Idle:
+//                            if (gamepad1.a && gamepad1.start == false) {
+//                                switchStack = switchStack.FirstActions;
+//                                running=false;
+//                                timer.reset();
+//                            }
+//                            break;
+//                        case FirstActions:
+//                            robot.turret.MAX_POWER=1;
+//                            running = false;
+//                            robot.lift.setTargetHeight(idle);
+//                            robot.intake.liftArm();
+//                            robot.intake.closeClaw();
+//                            robot.lift.setHorizontalPosition(horizontallifted);
+//                            switchStack = switchStack.SecondActions;
+//                            timer.reset();
+//                            break;
+//                        case SecondActions:
+//                            if (timer.milliseconds() > 700) {
+//                                robot.turret.setTargetAngle(back);
+//                                robotMode = robotMode.STACK;
+//                                robotState = robotState.IDLE;
+//                                switchStack = switchStack.Idle;
+//                                timer.reset();
+//                            }
+//                    }
+//                    if(gamepad1.left_bumper){
+//                        running = true;
+//                        autotimer.reset();
+//                    }
+//                    if(gamepad2.right_bumper){
+//                        running = false;
+//                    }
+//                    if (running == true) {
+//                        if(timer.milliseconds()<300) {
+//                            robot.turret.MAX_POWER = 0.6;
+//                            robot.intake.centerArm();
+//                            robot.intake.fullyOpenClaw();
+//                            robot.lift.setHorizontalPosition(horizontalextended);
+//                        }else if (autotimer.milliseconds() > 300 && autotimer.milliseconds() < 400) {
+//                            robot.intake.closeClaw();
+//                        } else if (autotimer.milliseconds() > 700 && autotimer.milliseconds() < 1300) {
+//                            robot.lift.setHorizontalPosition(horizontalback);
+//                            robot.lift.setTargetHeight(up);
+//                            robot.intake.setArmPos(0.6);
+//                            robot.turret.setTargetAngle(back);
+//                        } else if (autotimer.milliseconds() > 1600 && autotimer.milliseconds() < 1700) {
+//                            robot.lift.setHorizontalPosition(0.6);
+//                        } else if (autotimer.milliseconds() > 1900 && autotimer.milliseconds() < 2100) {
+//                            robot.lift.setTargetHeight(robot.lift.getCurrentHeight() - droppedvalue);
+//                        } else if (autotimer.milliseconds() > 2100 && autotimer.milliseconds() < 2800) {
+//                            robot.intake.openClaw();
+//                            robot.intake.centerArm();
+//                            robot.lift.setTargetHeight(200);
+//                            robot.turret.setTargetAngle(front);
+//                        } else if (autotimer.milliseconds() > 2800) {
+//                            autotimer.reset();
+//                        }
+//                    }
             }
 
             telemetry.addData("turret pos", robot.turret.getCurrentAngle());
